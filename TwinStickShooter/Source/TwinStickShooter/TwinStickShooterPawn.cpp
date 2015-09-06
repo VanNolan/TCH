@@ -28,7 +28,6 @@ ATwinStickShooterPawn::ATwinStickShooterPawn()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->AttachTo(RootComponent);
 	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when ship does
-	CameraBoom->TargetArmLength = ZoomLevel;
 	CameraBoom->RelativeRotation = FRotator(-80.f, 0.f, 0.f);
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
@@ -43,6 +42,12 @@ ATwinStickShooterPawn::ATwinStickShooterPawn()
 	GunOffset = FVector(90.f, 0.f, 0.f);
 	FireRate = 0.1f;
 	bCanFire = true;
+}
+
+void ATwinStickShooterPawn::PostLoad()
+{
+	Super::PostLoad();
+	CameraBoom->TargetArmLength = ZoomLevel;
 }
 
 void ATwinStickShooterPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -94,8 +99,11 @@ void ATwinStickShooterPawn::Tick(float DeltaSeconds)
 
 	// Find Camera Zoom
 	const float ZoomTriggerValue = GetInputAxisValue(ZoomTriggerBinding);
-	CameraBoom->TargetArmLength =  ZoomLevel * (1.f - ZoomTriggerValue);
-
+	if (ZoomTriggerValue > 0.0f)
+	{
+		CameraBoom->TargetArmLength = ZoomLevel * (1.f - ZoomTriggerValue);
+	}
+	
 
 }
 

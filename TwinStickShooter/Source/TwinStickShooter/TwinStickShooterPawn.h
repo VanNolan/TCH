@@ -24,6 +24,8 @@ class ATwinStickShooterPawn : public APawn
 public:
 	ATwinStickShooterPawn();
 
+	virtual void PostLoad() override;
+
 	/** Offset from the ships location to spawn projectiles */
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite )
 	FVector GunOffset;
