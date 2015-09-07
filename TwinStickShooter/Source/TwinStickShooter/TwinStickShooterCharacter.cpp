@@ -1,41 +1,45 @@
-// Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TwinStickShooter.h"
-#include "TwinStickShooterPawn.h"
+#include "TwinStickShooterCharacter.h"
+#include "TwinStickShooterCharacter.h"
 #include "TwinStickShooterProjectile.h"
 #include "TimerManager.h"
 
-const FName ATwinStickShooterPawn::MoveForwardBinding("MoveForward");
-const FName ATwinStickShooterPawn::MoveRightBinding("MoveRight");
-const FName ATwinStickShooterPawn::FireForwardBinding("FireForward");
-const FName ATwinStickShooterPawn::FireRightBinding("FireRight");
-const FName ATwinStickShooterPawn::ZoomTriggerBinding("ZoomTrigger");
+const FName ATwinStickShooterCharacter::MoveForwardBinding("MoveForward");
+const FName ATwinStickShooterCharacter::MoveRightBinding("MoveRight");
+const FName ATwinStickShooterCharacter::FireForwardBinding("FireForward");
+const FName ATwinStickShooterCharacter::FireRightBinding("FireRight");
+const FName ATwinStickShooterCharacter::ZoomTriggerBinding("ZoomTrigger");
 
-ATwinStickShooterPawn::ATwinStickShooterPawn()
-{	
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Game/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
-	// Create the mesh component
-	ShipMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
-	RootComponent = ShipMeshComponent;
-	ShipMeshComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
-	ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
-	
-	// Cache our sound effect
-	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
-	FireSound = FireAudio.Object;
+ATwinStickShooterCharacter::ATwinStickShooterCharacter()
+{
+	// Set size for player capsule
+	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+
+	// Don't rotate character to camera direction
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	// Configure character movement
+	GetCharacterMovement()->bOrientRotationToMovement = true; // Rotate character to moving direction
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
+	GetCharacterMovement()->bConstrainToPlane = true;
+	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->AttachTo(RootComponent);
-	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when ship does
-	CameraBoom->TargetArmLength = ZoomLevel;
-	CameraBoom->RelativeRotation = FRotator(-80.f, 0.f, 0.f);
+	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when character does
+	CameraBoom->TargetArmLength = 800.f;
+	CameraBoom->RelativeRotation = FRotator(-60.f, 0.f, 0.f);
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
 	// Create a camera...
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
-	CameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
-	CameraComponent->bUsePawnControlRotation = false;	// Camera does not rotate relative to arm
+	TwinStickShooterCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TwinStickShooterCamera"));
+	TwinStickShooterCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
+	TwinStickShooterCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Movement
 	MoveSpeed = 1000.0f;
@@ -45,7 +49,8 @@ ATwinStickShooterPawn::ATwinStickShooterPawn()
 	bCanFire = true;
 }
 
-void ATwinStickShooterPawn::SetupPlayerInputComponent(class UInputComponent* InputComponent)
+
+void ATwinStickShooterCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	check(InputComponent);
 
@@ -57,7 +62,7 @@ void ATwinStickShooterPawn::SetupPlayerInputComponent(class UInputComponent* Inp
 	InputComponent->BindAxis(ZoomTriggerBinding);
 }
 
-void ATwinStickShooterPawn::Tick(float DeltaSeconds)
+void ATwinStickShooterCharacter::Tick(float DeltaSeconds)
 {
 	// Find movement direction
 	const float ForwardValue = GetInputAxisValue(MoveForwardBinding);
@@ -75,7 +80,7 @@ void ATwinStickShooterPawn::Tick(float DeltaSeconds)
 		const FRotator NewRotation = Movement.Rotation();
 		FHitResult Hit(1.f);
 		RootComponent->MoveComponent(Movement, NewRotation, true, &Hit);
-		
+
 		if (Hit.IsValidBlockingHit())
 		{
 			const FVector Normal2D = Hit.Normal.GetSafeNormal2D();
@@ -83,7 +88,7 @@ void ATwinStickShooterPawn::Tick(float DeltaSeconds)
 			RootComponent->MoveComponent(Deflection, NewRotation, true);
 		}
 	}
-	
+
 	// Create fire direction vector
 	const float FireForwardValue = GetInputAxisValue(FireForwardBinding);
 	const float FireRightValue = GetInputAxisValue(FireRightBinding);
@@ -101,12 +106,11 @@ void ATwinStickShooterPawn::Tick(float DeltaSeconds)
 		FireShot(ShotDirection);
 }
 
-void ATwinStickShooterPawn::FireShot(FVector FireDirection)
+void ATwinStickShooterCharacter::FireShot(FVector FireDirection)
 {
 	// If we it's ok to fire again
 	if (bCanFire == true)
 	{
-
 		const FRotator FireRotation = FireDirection.Rotation();
 		// Spawn projectile at an offset from this pawn
 		const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
@@ -119,7 +123,7 @@ void ATwinStickShooterPawn::FireShot(FVector FireDirection)
 		}
 
 		bCanFire = false;
-		World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &ATwinStickShooterPawn::ShotTimerExpired, FireRate);
+		World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &ATwinStickShooterCharacter::ShotTimerExpired, FireRate);
 
 		// try and play the sound if specified
 		if (FireSound != nullptr)
@@ -131,7 +135,7 @@ void ATwinStickShooterPawn::FireShot(FVector FireDirection)
 	}
 }
 
-void ATwinStickShooterPawn::ShotTimerExpired()
+void ATwinStickShooterCharacter::ShotTimerExpired()
 {
 	bCanFire = true;
 }
