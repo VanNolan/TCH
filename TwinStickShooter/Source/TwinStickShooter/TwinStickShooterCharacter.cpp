@@ -14,7 +14,6 @@ const FName ATwinStickShooterCharacter::ZoomTriggerBinding("ZoomTrigger");
 
 ATwinStickShooterCharacter::ATwinStickShooterCharacter()
 {
-	ProjectileClass = NULL;
 		
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -95,7 +94,7 @@ void ATwinStickShooterCharacter::Tick(float DeltaSeconds)
 	const float ZoomTriggerValue = GetInputAxisValue(ZoomTriggerBinding);
 	// Try and fire a shot
 	if (ZoomTriggerValue > 0.7f)
-		FireShot(FireDirection);
+		FireShot_Implementation(FireDirection);
 }
 
 void ATwinStickShooterCharacter::FireShot_Implementation(FVector FireDirection)
@@ -150,7 +149,7 @@ void ATwinStickShooterCharacter::ServerFireShot_Implementation(FVector FireDirec
 	// This function is only called on the server (where Role == ROLE_Authority), called over the network by clients.
 	// We need to call FireShot()!
 	// Inside that function, Role == ROLE_Authority, so it won't try to call ServerSetSomeBool() again.
-	FireShot_Implementation(FireDirection);
+	FireShot(FireDirection);
 }
 
 void ATwinStickShooterCharacter::ShotTimerExpired()
