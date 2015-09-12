@@ -14,9 +14,7 @@ const FName ATwinStickShooterCharacter::ZoomTriggerBinding("ZoomTrigger");
 
 ATwinStickShooterCharacter::ATwinStickShooterCharacter()
 {
-	ConstructorHelpers::FObjectFinder<UBlueprint> projectileBPClass(TEXT("/Game/Blueprints/TwinStickShooterProjectile.TwinStickShooterProjectile"));
-	ProjectileBP = (UClass*)projectileBPClass.Object->GeneratedClass;
-;
+	ProjectileClass = NULL;
 		
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -52,7 +50,6 @@ ATwinStickShooterCharacter::ATwinStickShooterCharacter()
 	FireRate = 0.1f;
 	bCanFire = true;
 }
-
 
 void ATwinStickShooterCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
@@ -102,8 +99,7 @@ void ATwinStickShooterCharacter::Tick(float DeltaSeconds)
 		FireShot(ShotDirection);
 }
 
-
-void ATwinStickShooterCharacter::FireShot(FVector FireDirection)
+void ATwinStickShooterCharacter::FireShot_Implementation(FVector FireDirection)
 {
 	// If we it's ok to fire again
 	if (bCanFire == true)
@@ -116,9 +112,11 @@ void ATwinStickShooterCharacter::FireShot(FVector FireDirection)
 		if (World != NULL)
 		{
 			// spawn the projectile
-			if (ProjectileBP != NULL)
+			if (ProjectileClass != NULL)
 			{
-				World->SpawnActor<AActor>(ProjectileBP, SpawnLocation, FireRotation);
+				FActorSpawnParameters params;
+				params.Instigator = this;
+				World->SpawnActor<AActor>(ProjectileClass, SpawnLocation, FireRotation, params);
 			}
 			//ATwinStickShooterProjectile* projectile = World->SpawnActor<ATwinStickShooterProjectile>(SpawnLocation, FireRotation);
 		}
@@ -153,7 +151,7 @@ void ATwinStickShooterCharacter::ServerFireShot_Implementation(FVector FireDirec
 	// This function is only called on the server (where Role == ROLE_Authority), called over the network by clients.
 	// We need to call FireShot()!
 	// Inside that function, Role == ROLE_Authority, so it won't try to call ServerSetSomeBool() again.
-	FireShot(FireDirection);
+	FireShot_Implementation(FireDirection);
 }
 
 void ATwinStickShooterCharacter::ShotTimerExpired()
