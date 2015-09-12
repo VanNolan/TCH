@@ -14,6 +14,10 @@ const FName ATwinStickShooterCharacter::ZoomTriggerBinding("ZoomTrigger");
 
 ATwinStickShooterCharacter::ATwinStickShooterCharacter()
 {
+	ConstructorHelpers::FObjectFinder<UBlueprint> projectileBPClass(TEXT("/Game/Blueprints/TwinStickShooterProjectile.TwinStickShooterProjectile"));
+	ProjectileBP = (UClass*)projectileBPClass.Object->GeneratedClass;
+;
+		
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -77,17 +81,7 @@ void ATwinStickShooterCharacter::Tick(float DeltaSeconds)
 	// If non-zero size, move this actor
 	if (Movement.SizeSquared() > 0.0f)
 	{
-		GetCharacterMovement()->RequestDirectMove(Movement, false);
-		/*const FRotator NewRotation = Movement.Rotation();
-		FHitResult Hit(1.f);
-		RootComponent->MoveComponent(Movement, NewRotation, true, &Hit);
-		
-		if (Hit.IsValidBlockingHit())
-		{
-			const FVector Normal2D = Hit.Normal.GetSafeNormal2D();
-			const FVector Deflection = FVector::VectorPlaneProject(Movement, Normal2D) * (1.f - Hit.Time);
-			RootComponent->MoveComponent(Deflection, NewRotation, true);
-		}*/
+		AddMovementInput(Movement, 1.0f, false);
 	}
 
 
@@ -108,6 +102,7 @@ void ATwinStickShooterCharacter::Tick(float DeltaSeconds)
 		FireShot(ShotDirection);
 }
 
+
 void ATwinStickShooterCharacter::FireShot(FVector FireDirection)
 {
 	// If we it's ok to fire again
@@ -121,7 +116,11 @@ void ATwinStickShooterCharacter::FireShot(FVector FireDirection)
 		if (World != NULL)
 		{
 			// spawn the projectile
-			World->SpawnActor<ATwinStickShooterProjectile>(SpawnLocation, FireRotation);
+			if (ProjectileBP != NULL)
+			{
+				World->SpawnActor<AActor>(ProjectileBP, SpawnLocation, FireRotation);
+			}
+			//ATwinStickShooterProjectile* projectile = World->SpawnActor<ATwinStickShooterProjectile>(SpawnLocation, FireRotation);
 		}
 
 		bCanFire = false;
@@ -133,8 +132,28 @@ void ATwinStickShooterCharacter::FireShot(FVector FireDirection)
 			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 		}
 
-		bCanFire = false;
+		bCanFire = false; 
 	}
+
+	// If this next check succeeds, we are *not* the authority, meaning we are a network client.
+	// In this case we also want to call the server function to tell it to change the bSomeBool property as well.
+	if (Role < ROLE_Authority)
+	{
+		ServerFireShot(FireDirection);
+	}
+}
+
+bool ATwinStickShooterCharacter::ServerFireShot_Validate(FVector FireDirection)
+{
+	return true;
+}
+
+void ATwinStickShooterCharacter::ServerFireShot_Implementation(FVector FireDirection)
+{
+	// This function is only called on the server (where Role == ROLE_Authority), called over the network by clients.
+	// We need to call FireShot()!
+	// Inside that function, Role == ROLE_Authority, so it won't try to call ServerSetSomeBool() again.
+	FireShot(FireDirection);
 }
 
 void ATwinStickShooterCharacter::ShotTimerExpired()

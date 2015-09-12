@@ -16,9 +16,11 @@ ATwinStickShooterProjectile::ATwinStickShooterProjectile()
 	ProjectileMesh->BodyInstance.SetCollisionProfileName("Projectile");
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &ATwinStickShooterProjectile::OnHit);		// set up a notification for when this component hits something
 	RootComponent = ProjectileMesh;
+	RootComponent->SetIsReplicated(true);
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
+	ProjectileMovement->SetIsReplicated(true);
 	ProjectileMovement->UpdatedComponent = ProjectileMesh;
 	ProjectileMovement->InitialSpeed = 3000.f;
 	ProjectileMovement->MaxSpeed = 3000.f;
