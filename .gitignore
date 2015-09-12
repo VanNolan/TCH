@@ -1,15 +1,14 @@
 /Binaries
-
 /DerivedDataCache
-
 /Intermediate
-
 /Saved
 
 *.sln
-
 *.sdf
-
 *.suo
+*.opensdf
+TwinStickShooter/DerivedDataCache
+TwinStickShooter/Binaries
 TwinStickShooter/Intermediate/
 TwinStickShooter/Saved/
+
