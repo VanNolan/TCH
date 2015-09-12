@@ -25,6 +25,11 @@ public:
 	/** Returns TCHeroesCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetTwinStickShooterCameraComponent() const { return TwinStickShooterCameraComponent; }
 
+	/** Get Fire Direction */
+	UFUNCTION(BlueprintPure, Category = "ATwinStickShooterPawn")
+	FVector GetFireDirection() const { return FireDirection; }
+
+
 	/** Offset from the ships location to spawn projectiles */
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 		FVector GunOffset;
@@ -67,5 +72,7 @@ private:
 	/** Handle for efficient management of ShotTimerExpired timer */
 	FTimerHandle TimerHandle_ShotTimerExpired;
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	FVector FireDirection;
 	
 };
