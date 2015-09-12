@@ -17,8 +17,7 @@ class TWINSTICKSHOOTER_API ATwinStickShooterCharacter : public ACharacter
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
-
-
+	
 public:
 	ATwinStickShooterCharacter();
 	
@@ -47,6 +46,7 @@ public:
 	// End Actor Interface
 
 	/* Fire a shot in the specified direction */
+	UFUNCTION(BlueprintNativeEvent, Category = "Firing")
 	void FireShot(FVector FireDirection);
 	UFUNCTION(Server, WithValidation, Reliable)
 	void ServerFireShot(FVector FireDirection);
@@ -63,6 +63,10 @@ public:
 	static const FName FireRightBinding;
 	static const FName ZoomTriggerBinding;
 
+	/** Projectile actor to create each time the character shoots*/
+	UPROPERTY(Category = Bullet, EditAnywhere, BlueprintReadWrite)
+	UClass* ProjectileClass;
+
 private:
 
 	/* Flag to control firing  */
@@ -71,5 +75,4 @@ private:
 	/** Handle for efficient management of ShotTimerExpired timer */
 	FTimerHandle TimerHandle_ShotTimerExpired;
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	UClass* ProjectileBP;
 };
