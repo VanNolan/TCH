@@ -87,18 +87,17 @@ void ATwinStickShooterPawn::Tick(float DeltaSeconds)
 	// Create fire direction vector
 	const float FireForwardValue = GetInputAxisValue(FireForwardBinding);
 	const float FireRightValue = GetInputAxisValue(FireRightBinding);
-	const FVector FireDirection = FVector(FireForwardValue, FireRightValue, 0.f);
-	FVector ShotDirection = FireDirection;
+	FireDirection = FVector(FireForwardValue, FireRightValue, 0.f);
 	// If we are pressing fire stick in a direction
-	if (ShotDirection.SizeSquared() <= 0.000001f)
-		ShotDirection = MoveDirection;
-	if (ShotDirection.SizeSquared() <= 0.000001f)
-		ShotDirection = GetActorForwardVector();
+	if (FireDirection.SizeSquared() <= 0.000001f)
+		FireDirection = MoveDirection;
+	if (FireDirection.SizeSquared() <= 0.000001f)
+		FireDirection = GetActorForwardVector();
 
 	const float ZoomTriggerValue = GetInputAxisValue(ZoomTriggerBinding);
 	// Try and fire a shot
 	if (ZoomTriggerValue > 0.7f)
-		FireShot(ShotDirection);
+		FireShot(FireDirection);
 }
 
 void ATwinStickShooterPawn::FireShot(FVector FireDirection)
