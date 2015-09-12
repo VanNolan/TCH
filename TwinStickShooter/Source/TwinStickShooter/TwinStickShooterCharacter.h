@@ -21,7 +21,7 @@ class TWINSTICKSHOOTER_API ATwinStickShooterCharacter : public ACharacter
 
 public:
 	ATwinStickShooterCharacter();
-
+	
 	/** Returns TCHeroesCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetTwinStickShooterCameraComponent() const { return TwinStickShooterCameraComponent; }
 
@@ -48,6 +48,10 @@ public:
 
 	/* Fire a shot in the specified direction */
 	void FireShot(FVector FireDirection);
+	UFUNCTION(Server, WithValidation, Reliable)
+	void ServerFireShot(FVector FireDirection);
+	void ServerFireShot_Implementation(FVector FireDirection);
+	bool ServerFireShot_Validate(FVector FireDirection);
 
 	/* Handler for the fire timer expiry */
 	void ShotTimerExpired();
@@ -67,5 +71,5 @@ private:
 	/** Handle for efficient management of ShotTimerExpired timer */
 	FTimerHandle TimerHandle_ShotTimerExpired;
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	
+	UClass* ProjectileBP;
 };
