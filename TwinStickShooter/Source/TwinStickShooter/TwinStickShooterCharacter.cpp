@@ -96,7 +96,6 @@ void ATwinStickShooterCharacter::Tick(float DeltaSeconds)
 	if (ZoomTriggerValue > 0.7f)
 	{
 		FireShot_Implementation(FireDirection);
-		FireShot(FireDirection);
 	}
 	
 	OnTick(DeltaSeconds);
@@ -107,6 +106,8 @@ void ATwinStickShooterCharacter::FireShot_Implementation(FVector FireDirection)
 	// If we it's ok to fire again
 	if (bCanFire == true)
 	{
+		FireShot(FireDirection);
+
 		const FRotator FireRotation = FireDirection.Rotation();
 		// Spawn projectile at an offset from this pawn
 		const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
