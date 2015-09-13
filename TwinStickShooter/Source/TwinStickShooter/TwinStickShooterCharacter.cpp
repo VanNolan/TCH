@@ -94,7 +94,10 @@ void ATwinStickShooterCharacter::Tick(float DeltaSeconds)
 	const float ZoomTriggerValue = GetInputAxisValue(ZoomTriggerBinding);
 	// Try and fire a shot
 	if (ZoomTriggerValue > 0.7f)
+	{
 		FireShot_Implementation(FireDirection);
+		FireShot(FireDirection);
+	}
 }
 
 void ATwinStickShooterCharacter::FireShot_Implementation(FVector FireDirection)
@@ -109,23 +112,26 @@ void ATwinStickShooterCharacter::FireShot_Implementation(FVector FireDirection)
 		UWorld* const World = GetWorld();
 		if (World != NULL)
 		{
-			// spawn the projectile
-			if (ProjectileClass != NULL)
+			//Spawn only server side at it will automatically spawns a replicate on client's side
+			if (Role >= ROLE_Authority)
 			{
-				FActorSpawnParameters params;
-				params.Instigator = this;
-				World->SpawnActor<AActor>(ProjectileClass, SpawnLocation, FireRotation, params);
+				// spawn the projectile
+				if (ProjectileClass != NULL)
+				{
+					FActorSpawnParameters params;
+					params.Instigator = this;
+					World->SpawnActor<AActor>(ProjectileClass, SpawnLocation, FireRotation, params);
+				}
+				//ATwinStickShooterProjectile* projectile = World->SpawnActor<ATwinStickShooterProjectile>(SpawnLocation, FireRotation);
 			}
-			//ATwinStickShooterProjectile* projectile = World->SpawnActor<ATwinStickShooterProjectile>(SpawnLocation, FireRotation);
-		}
 
-		bCanFire = false;
-		World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &ATwinStickShooterCharacter::ShotTimerExpired, FireRate);
+			World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &ATwinStickShooterCharacter::ShotTimerExpired, FireRate);
 
-		// try and play the sound if specified
-		if (FireSound != nullptr)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+			// try and play the sound if specified
+			if (FireSound != nullptr)
+			{
+				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+			}
 		}
 
 		bCanFire = false; 
@@ -149,7 +155,7 @@ void ATwinStickShooterCharacter::ServerFireShot_Implementation(FVector FireDirec
 	// This function is only called on the server (where Role == ROLE_Authority), called over the network by clients.
 	// We need to call FireShot()!
 	// Inside that function, Role == ROLE_Authority, so it won't try to call ServerSetSomeBool() again.
-	FireShot(FireDirection);
+	FireShot_Implementation(FireDirection);
 }
 
 void ATwinStickShooterCharacter::ShotTimerExpired()
