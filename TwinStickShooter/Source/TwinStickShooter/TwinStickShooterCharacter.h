@@ -46,6 +46,8 @@ public:
 	class USoundBase* FireSound;
 
 	// Begin Actor Interface
+	UFUNCTION(BlueprintImplementableEvent, Category = "Tick")
+	void OnTick(float DeltaSeconds);
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End Actor Interface

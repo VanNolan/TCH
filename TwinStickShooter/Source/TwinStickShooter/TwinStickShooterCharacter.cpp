@@ -98,6 +98,8 @@ void ATwinStickShooterCharacter::Tick(float DeltaSeconds)
 		FireShot_Implementation(FireDirection);
 		FireShot(FireDirection);
 	}
+	
+	OnTick(DeltaSeconds);
 }
 
 void ATwinStickShooterCharacter::FireShot_Implementation(FVector FireDirection)
