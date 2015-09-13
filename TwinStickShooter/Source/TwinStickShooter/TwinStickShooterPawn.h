@@ -23,6 +23,10 @@ class ATwinStickShooterPawn : public APawn
 
 public:
 	ATwinStickShooterPawn();
+
+	/** Get Fire Direction */
+	UFUNCTION(BlueprintPure, Category = "ATwinStickShooterPawn")
+	FVector GetFireDirection() { return FireDirection; }
 	
 	/** Offset from the ships location to spawn projectiles */
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite )
@@ -68,6 +72,8 @@ private:
 
 	/** Handle for efficient management of ShotTimerExpired timer */
 	FTimerHandle TimerHandle_ShotTimerExpired;
+
+	FVector FireDirection;
 
 public:
 	/** Returns ShipMeshComponent subobject **/

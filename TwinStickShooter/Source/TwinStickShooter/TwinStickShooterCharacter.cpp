@@ -14,7 +14,6 @@ const FName ATwinStickShooterCharacter::ZoomTriggerBinding("ZoomTrigger");
 
 ATwinStickShooterCharacter::ATwinStickShooterCharacter()
 {
-	ProjectileClass = NULL;
 		
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -85,18 +84,17 @@ void ATwinStickShooterCharacter::Tick(float DeltaSeconds)
 	// Create fire direction vector
 	const float FireForwardValue = GetInputAxisValue(FireForwardBinding);
 	const float FireRightValue = GetInputAxisValue(FireRightBinding);
-	const FVector FireDirection = FVector(FireForwardValue, FireRightValue, 0.f);
-	FVector ShotDirection = FireDirection;
+	FireDirection = FVector(FireForwardValue, FireRightValue, 0.f);
 	// If we are pressing fire stick in a direction
-	if (ShotDirection.SizeSquared() <= 0.000001f)
-		ShotDirection = MoveDirection;
-	if (ShotDirection.SizeSquared() <= 0.000001f)
-		ShotDirection = GetActorForwardVector();
+	if (FireDirection.SizeSquared() <= 0.000001f)
+		FireDirection = MoveDirection;
+	if (FireDirection.SizeSquared() <= 0.000001f)
+		FireDirection = GetActorForwardVector();
 
 	const float ZoomTriggerValue = GetInputAxisValue(ZoomTriggerBinding);
 	// Try and fire a shot
 	if (ZoomTriggerValue > 0.7f)
-		FireShot(ShotDirection);
+		FireShot_Implementation(FireDirection);
 }
 
 void ATwinStickShooterCharacter::FireShot_Implementation(FVector FireDirection)
@@ -151,7 +149,7 @@ void ATwinStickShooterCharacter::ServerFireShot_Implementation(FVector FireDirec
 	// This function is only called on the server (where Role == ROLE_Authority), called over the network by clients.
 	// We need to call FireShot()!
 	// Inside that function, Role == ROLE_Authority, so it won't try to call ServerSetSomeBool() again.
-	FireShot_Implementation(FireDirection);
+	FireShot(FireDirection);
 }
 
 void ATwinStickShooterCharacter::ShotTimerExpired()
