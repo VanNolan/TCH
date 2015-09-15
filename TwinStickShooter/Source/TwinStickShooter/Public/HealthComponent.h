@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Components/ActorComponent.h"
+#include "GameFramework/Controller.h"
 #include "HealthComponent.generated.h"
 
 //Multi cast delegate can bind multiple functions, use AddDynamic(...) to add function to multicast bind
@@ -37,9 +38,14 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Health")
 		FZeroHPReachedDelegate OnZeroHealthPointReached;
 
-	/* Function to call apply damages */
+	/* Function to call to apply damages */
 	UFUNCTION(BlueprintCallable, Category = "Health")
-		void ApplyDamages(int32 Damages);
+		void ApplyDamages(int32 Damages, AController* Instigator);
 
+	/* Function to call to reset health values*/
+	UFUNCTION(BlueprintCallable, Category = "Health")
+		void Reset();
 
+	UPROPERTY(Category = Health, BlueprintReadOnly)
+		AController* LastInstigator;
 };
