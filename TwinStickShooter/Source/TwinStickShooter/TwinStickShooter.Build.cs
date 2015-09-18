@@ -6,6 +6,7 @@ public class TwinStickShooter : ModuleRules
 {
 	public TwinStickShooter(TargetInfo Target)
 	{
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "OnlineSubsystem", "OnlineSubsystemNull", "OnlineSubsystemUtils" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "OnlineSubsystem" });
 	}
 }
