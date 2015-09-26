@@ -126,7 +126,7 @@ void ATwinStickShooterCharacter::FireShot_Implementation(FVector FireDirection)
 				if (ProjectileClass != NULL)
 				{
 					FActorSpawnParameters params;
-					params.Instigator = this;
+					params.Owner = this;
 					World->SpawnActor<AActor>(ProjectileClass, SpawnLocation, FireRotation, params);
 				}
 				//ATwinStickShooterProjectile* projectile = World->SpawnActor<ATwinStickShooterProjectile>(SpawnLocation, FireRotation);
