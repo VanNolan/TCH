@@ -47,7 +47,8 @@ ATwinStickShooterCharacter::ATwinStickShooterCharacter()
 	// Weapon
 	GunOffset = FVector(90.f, 0.f, 0.f);
 	FireRate = 0.1f;
-	bCanFire = true;
+	bCanFire = true; 
+	CanShoot = true;
 }
 
 void ATwinStickShooterCharacter::SetupPlayerInputComponent(class UInputComponent* InputComponent)
@@ -103,6 +104,9 @@ void ATwinStickShooterCharacter::Tick(float DeltaSeconds)
 
 void ATwinStickShooterCharacter::FireShot_Implementation(FVector FireDirection)
 {
+	if (!CanShoot)
+		return;
+
 	// If we it's ok to fire again
 	if (bCanFire == true)
 	{

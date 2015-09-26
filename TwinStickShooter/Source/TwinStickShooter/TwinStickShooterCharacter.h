@@ -74,6 +74,10 @@ public:
 	UPROPERTY(Category = Bullet, EditAnywhere, BlueprintReadWrite)
 	UClass* ProjectileClass;
 
+	/** Projectile actor to create each time the character shoots*/
+	UPROPERTY(Category = Firing, EditAnywhere, BlueprintReadWrite)
+		bool CanShoot;
+
 private:
 
 	/* Flag to control firing  */
