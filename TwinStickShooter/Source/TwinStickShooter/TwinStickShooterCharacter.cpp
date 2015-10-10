@@ -2,8 +2,6 @@
 
 #include "TwinStickShooter.h"
 #include "TwinStickShooterCharacter.h"
-#include "TwinStickShooterCharacter.h"
-#include "TwinStickShooterProjectile.h"
 #include "TimerManager.h"
 
 const FName ATwinStickShooterCharacter::MoveForwardBinding("MoveForward");
