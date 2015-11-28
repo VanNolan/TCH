@@ -75,7 +75,7 @@ void AFogOfWarWorker::UpdateFowTexture()
 		}
 
 		//Find actor position
-		if (!*Itr) return;
+		if (!*Itr) continue;
 		FVector position = (*Itr)->GetActorLocation();
 
 		//We divide by 100.0 because 1 texel equals 1 meter of visibility-data.
