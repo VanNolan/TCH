@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "FogOfWar")
 	void RegisterFowActor(AActor* Actor);
 
+	UFUNCTION(BlueprintCallable, Category = "FogOfWar")
+	void UnRegisterFowActor(AActor* Actor);
+
 	//Stolen from https://wiki.unrealengine.com/Dynamic_Textures
 	void UpdateTextureRegions(
 		UTexture2D* Texture,
