@@ -92,7 +92,14 @@ void AFogOfWarManager::RegisterFowActor(AActor* Actor)
 	{
 		FowActors.AddUnique(Actor);
 	}
-	
+}
+
+void AFogOfWarManager::UnRegisterFowActor(AActor* Actor)
+{
+	if (Actor)
+	{
+		FowActors.Remove(Actor);
+	}
 }
 
 bool AFogOfWarManager::GetIsBlurEnabled() 
