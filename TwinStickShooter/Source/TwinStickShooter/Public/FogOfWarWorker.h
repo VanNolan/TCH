@@ -30,6 +30,7 @@ public:
 
 	//Method to perform work
 	void UpdateFowTexture();
+	void UpdateActorVisibility();
 
 	bool bShouldUpdate = false;
 

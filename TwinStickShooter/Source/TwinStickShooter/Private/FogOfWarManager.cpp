@@ -2,6 +2,7 @@
 
 #include "TwinStickShooter.h"
 #include "FogOfWarManager.h"
+#include "EngineUtils.h"
 
 // Sets default values
 AFogOfWarManager::AFogOfWarManager()
@@ -100,6 +101,20 @@ void AFogOfWarManager::UnRegisterFowActor(AActor* Actor)
 	{
 		FowActors.Remove(Actor);
 	}
+}
+
+bool AFogOfWarManager::IsActorCurrentlyInSight(AActor* Actor)
+{
+	//Find actor position
+	if (!Actor) return false;
+	FVector position = Actor->GetActorLocation();
+
+	float dividend = 100.0f / SamplesPerMeter;
+	uint32 halfTextureSize = TextureSize / 2;
+	int posX = (int)(position.X / dividend) + halfTextureSize;
+	int posY = (int)(position.Y / dividend) + halfTextureSize;
+
+	return CurrentlyInSight.Contains(FVector2D(posX, posY));
 }
 
 bool AFogOfWarManager::GetIsBlurEnabled() 

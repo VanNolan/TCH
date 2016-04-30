@@ -34,6 +34,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "FogOfWar")
 	void UnRegisterFowActor(AActor* Actor);
 
+	UFUNCTION(BlueprintCallable, Category = "FogOfWar")
+	bool IsActorCurrentlyInSight(AActor* Actor);
+
 	//Stolen from https://wiki.unrealengine.com/Dynamic_Textures
 	void UpdateTextureRegions(
 		UTexture2D* Texture,
@@ -68,6 +71,9 @@ public:
 	//Array containing what parts of the map we've unveiled.
 	UPROPERTY()
 		TArray<bool> UnfoggedData;
+
+	//Array of currently seeing part
+		TSet<FVector2D> CurrentlyInSight;
 
 	//Temp array for horizontal blur pass
 	UPROPERTY()

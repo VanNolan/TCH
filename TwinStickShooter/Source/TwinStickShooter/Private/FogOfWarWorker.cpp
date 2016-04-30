@@ -62,10 +62,11 @@ void AFogOfWarWorker::UpdateFowTexture()
 	Manager->LastFrameTextureData = TArray<FColor>(Manager->TextureData);
 	uint32 halfTextureSize = Manager->TextureSize / 2;
 	int signedSize = (int)Manager->TextureSize; //For convenience....
-	TSet<FVector2D> currentlyInSight;
 	TSet<FVector2D> texelsToBlur;
 	int sightTexels = Manager->SightRange * Manager->SamplesPerMeter;
 	float dividend = 100.0f / Manager->SamplesPerMeter;
+
+	Manager->CurrentlyInSight.Reset();
 
 	for (auto Itr(Manager->FowActors.CreateIterator()); Itr; Itr++) 
 	{
@@ -131,7 +132,7 @@ void AFogOfWarWorker::UpdateFowTexture()
 							//Unveil the positions we are currently seeing
 							Manager->UnfoggedData[x + y * Manager->TextureSize] = true;
 							//Store the positions we are currently seeing.
-							currentlyInSight.Add(FVector2D(x, y));
+							Manager->CurrentlyInSight.Add(FVector2D(x, y));
 						}
 					}
 				}
@@ -156,7 +157,7 @@ void AFogOfWarWorker::UpdateFowTexture()
 					if (Manager->UnfoggedData[x + shiftedIndex + (y * signedSize)])
 					{
 						//If we are currently looking at a position, unveil it completely
-						if (currentlyInSight.Contains(FVector2D(x + shiftedIndex, y))) 
+						if (Manager->CurrentlyInSight.Contains(FVector2D(x + shiftedIndex, y)))
 						{
 							sum += (Manager->blurKernel[i] * 255);
 						}
@@ -197,7 +198,7 @@ void AFogOfWarWorker::UpdateFowTexture()
 			{
 				if (Manager->UnfoggedData[x + (y * signedSize)]) 
 				{
-					if (currentlyInSight.Contains(FVector2D(x, y))) 
+					if (Manager->CurrentlyInSight.Contains(FVector2D(x, y)))
 					{
 						Manager->TextureData[x + y * signedSize] = FColor((uint8)255, (uint8)255, (uint8)255, 255);
 					}
