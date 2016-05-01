@@ -74,8 +74,8 @@ void AFogOfWarManager::StartFOWTextureUpdate()
 		FOWTexture = UTexture2D::CreateTransient(TextureSize, TextureSize);
 		LastFOWTexture = UTexture2D::CreateTransient(TextureSize, TextureSize);
 		int arraySize = TextureSize * TextureSize;
-		TextureData.Init(FColor(0, 0, 0, 255), arraySize);
-		LastFrameTextureData.Init(FColor(0, 0, 0, 255), arraySize);
+		TextureData.Init(FColor(100, 100, 100, 255), arraySize);
+		LastFrameTextureData.Init(FColor(100, 100, 100, 255), arraySize);
 		HorizontalBlurData.Init(0, arraySize);
 		UnfoggedData.Init(false, arraySize);
 		FowThread = new AFogOfWarWorker(this);
